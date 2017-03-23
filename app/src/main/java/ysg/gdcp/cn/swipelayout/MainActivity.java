@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import ysg.gdcp.cn.swipelayout.manager.SwipeLayoutManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,19 @@ public class MainActivity extends AppCompatActivity {
             list.add("郭思思" + i);
         }
         mLv.setAdapter(new MyAdapter());
+        mLv.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    SwipeLayoutManager.getSwipeLayoutManager().closeCurrent();
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
     }
 
     private void initViews() {
@@ -58,6 +75,17 @@ public class MainActivity extends AppCompatActivity {
             }
             ViewHolder holder = ViewHolder.getViewHolder(convertView);
             holder.tvName.setText(list.get(position));
+            holder.swipeLayout.setTag(position);
+            holder.swipeLayout.setOnSwipeStateChangeListener(new SwipeLayout.OnSwipeStateChangeListener() {
+                @Override
+                public void onOpen(Object tag) {
+                    Toast.makeText(MainActivity.this, "第"+(Integer)tag+"打开", Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onClose(Object tag) {
+                    Toast.makeText(MainActivity.this, "第"+(Integer)tag+"关闭", Toast.LENGTH_SHORT).show();
+                }
+            });
             return convertView;
         }
     }
@@ -65,10 +93,12 @@ public class MainActivity extends AppCompatActivity {
     static class ViewHolder {
         TextView tvName;
         TextView tvDeletel;
+        SwipeLayout swipeLayout;
 
         public ViewHolder(View convertView) {
             tvName = (TextView) convertView.findViewById(R.id.tv_name);
             tvDeletel = (TextView) convertView.findViewById(R.id.tv_delete);
+            swipeLayout =(SwipeLayout)convertView.findViewById(R.id.swiplayout);
         }
 
         public static ViewHolder getViewHolder(View convertView) {
